@@ -11,18 +11,15 @@ from ..database.connection import session, metadata, automap
 class BusinessSpider(scrapy.Spider):
     name = 'business'
 
-    
-    sqlalchemy.Table('crawler_source', metadata, autoload=True)
-    Source = automap.classes['crawler_source']
-
     def start_requests(self):
         sourceId = getattr(self, 'id', None)
         if sourceId is not None:
-            
+            sqlalchemy.Table('crawler_source', metadata, autoload=True)
+            Source = automap.classes['crawler_source']
             result = session.query(Source).filter(
-                Source.id == sourceId
+                Source.id == int(sourceId)
             ).one()
-            print(result)
+            #print(result)
 
         urls = [
             'http://quotes.toscrape.com/page/1/',

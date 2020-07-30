@@ -15,7 +15,7 @@ database = config['mysql']['Database']
 
 # 建立連線引擎
 engine = sqlalchemy.create_engine(
-    f'mysql+pymysql://{username}:{password}@{host}:{port}/{database}'
+    f'mysql+pymysql://{username}:{password}@{host}:{port}/{database}?charset=utf8mb4'
 )
 
 #取得資料庫元資料
