@@ -13,10 +13,10 @@ username = config['mysql']['User']
 password = config['mysql']['Password']
 database = config['mysql']['Database']
 
-# 建立連線引擎
-engine = sqlalchemy.create_engine(
-    f'mysql+pymysql://{username}:{password}@{host}:{port}/{database}?charset=utf8mb4'
-)
+# 建立連線引擎 
+connect_string = connect_string = 'mysql+mysqlconnector://{}:{}@{}:{}/{}'.format(username, password, host, port, database)
+connect_args = {'connect_timeout': 10}
+engine = sqlalchemy.create_engine(connect_string, connect_args=connect_args, echo=False)
 
 #取得資料庫元資料
 metadata = sqlalchemy.schema.MetaData(engine)
