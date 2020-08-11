@@ -27,6 +27,8 @@ class BusinessScrapyPipeline:
     __mediatable__ = 'crawler_media'
     
     def process_item(self, item, spider):
+        loguru.logger.info(item)
+        '''
         loguru.logger.info('process_item()')
         created = int(time.mktime(datetime.now().timetuple()))
 
@@ -52,7 +54,7 @@ class BusinessScrapyPipeline:
         article.source_content = item['source_content']
         article.created = created
         session.add(article)
-
+        '''
         return item
 
     def close_spider(self, spider):
