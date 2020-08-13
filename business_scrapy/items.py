@@ -26,6 +26,10 @@ class BooksItem(scrapy.Item):
     '''
     
 class BusinessScrapyItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    source_id = scrapy.Field()
+    topics = scrapy.Field()
+    article_url = scrapy.Field()
+
+    title = scrapy.Field()
+    final_image = scrapy.Field()
+    description = scrapy.Field()

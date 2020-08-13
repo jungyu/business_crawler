@@ -2,7 +2,7 @@
 TODO:
 資料表 crawler_source 欄位定義及範例：
   crawler_url = http://books.toscrape.com, http://... 使用逗號, 分隔
-  crawler_schema = {'allowed_domain': ['books.toscrape.com'], 'allow': 'catalogue/'}
+  crawler_schema = {"allowed_domain": ["books.toscrape.com"], "allow": "catalogue/", "xpath_exists": "//div[@id=\"product_gallery\"]", "xpath_title": "//div/h1/text()", "xpath_image":"//div[@class=\"item active\"]/img/@src", "xpath_description": "//div[@id=\"product_description\"]/following-sibling::p/text()"}
 '''
 import sys
 import re
@@ -15,7 +15,7 @@ import sqlalchemy
 import sqlalchemy.ext.automap
 
 from ..database.connection import session, metadata, automap
-from ..items import BooksItem
+from ..items import BusinessScrapyItem
 
 class Param():
     def __init__(self):
@@ -66,29 +66,27 @@ class BusinessSpider(CrawlSpider):
                   callback='parse_filter_book', follow=True)]
 
     def parse_filter_book(self, response):
-        exists = response.xpath('//div[@id="product_gallery"]').extract_first()
+        exists = response.xpath(self.schema['xpath_exists']).extract_first()
         if exists:
 
-            book = BooksItem()
+            business = BusinessScrapyItem()
 
-            title = response.xpath('//div/h1/text()').extract_first()
+            title = response.xpath(self.schema['xpath_title']).extract_first()
 
-            relative_image = response.xpath(
-                '//div[@class="item active"]/img/@src').extract_first()
+            relative_image = response.xpath(self.schema['xpath_image']).extract_first()
             final_image = self.base_url + relative_image.replace('../..', '')
 
-            description = response.xpath(
-                '//div[@id="product_description"]/following-sibling::p/text()').extract_first()
+            description = response.xpath(self.schema['xpath_description']).extract_first()
 
-            book['source_id'] = self.source.id
-            book['topics'] = self.source.topics
-            book['article_url'] = response.url
+            business['source_id'] = self.source.id
+            business['topics'] = self.source.topics
+            business['article_url'] = response.url
 
-            book['title'] = title
-            book['final_image'] = final_image
-            book['description'] = description
+            business['title'] = title
+            business['final_image'] = final_image
+            business['description'] = description
 
-            yield book
+            yield business
 
             '''
             XPath 範例
@@ -122,36 +120,6 @@ class BusinessSpider(CrawlSpider):
 
         else:
             print(response.url)
-    '''
-        self.rules = [
-            Rule(LinkExtractor(restrict_xpaths="//h3[@class='wp-show-posts-entry-title']/a"), callback='parse_item', follow=True),
-            Rule(LinkExtractor(restrict_xpaths="//a[@class='next page-numbers']"))
-            ]
-        
-        
-        self.rules = {
-            Rule(LinkExtractor(restrict_xpaths=self.schema["page_title"]), callback='parse_item', follow=True, process_request='set_user_agent'),
-            Rule(LinkExtractor(restrict_xpaths=self.schema["next_page"]), process_request='set_user_agent')
-        }
-        
-   
-    def start_requests(self):
-        yield scrapy.Request(url=self.source.crawler_url, meta={'source_id':self.source.id, 'topics':self.source.topics}, callback=self.parse_item)
-           
-
-    def parse_item(self, response):
-        yield{
-            'source_id':response.meta['source_id'],
-            'topics':response.meta['topics'],
-            'article_url':response.url,
-            'title':response.xpath(self.schema["title"]).get(),
-            'source_content':(response.xpath(self.schema["source_content"]).get()).replace("\n","")
-        }
-
-    def parse_article(self, response):
-        pass
-
-    '''
 
 
         
