@@ -6,8 +6,15 @@
 import scrapy
 
 class BooksItem(scrapy.Item):
+
+    source_id = scrapy.Field()
+    topics = scrapy.Field()
+    article_url = scrapy.Field()
+
     title = scrapy.Field()
     final_image = scrapy.Field()
+    description = scrapy.Field()
+    '''
     price = scrapy.Field()
     stock = scrapy.Field()
     stars = scrapy.Field()
@@ -16,6 +23,7 @@ class BooksItem(scrapy.Item):
     price_excl_tax = scrapy.Field()
     price_inc_tax = scrapy.Field()
     tax = scrapy.Field()
+    '''
     
 class BusinessScrapyItem(scrapy.Item):
     # define the fields for your item here like:

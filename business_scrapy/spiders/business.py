@@ -77,6 +77,21 @@ class BusinessSpider(CrawlSpider):
                 '//div[@class="item active"]/img/@src').extract_first()
             final_image = self.base_url + relative_image.replace('../..', '')
 
+            description = response.xpath(
+                '//div[@id="product_description"]/following-sibling::p/text()').extract_first()
+
+            book['source_id'] = self.source.id
+            book['topics'] = self.source.topics
+            book['article_url'] = response.url
+
+            book['title'] = title
+            book['final_image'] = final_image
+            book['description'] = description
+
+            yield book
+
+            '''
+            XPath 範例
             price = response.xpath(
                 '//div[contains(@class, "product_main")]/p[@class="price_color"]/text()').extract_first()
             stock = response.xpath(
@@ -93,19 +108,17 @@ class BusinessSpider(CrawlSpider):
                 '//table[@class="table table-striped"]/tr[4]/td/text()').extract_first()
             tax = response.xpath(
                 '//table[@class="table table-striped"]/tr[5]/td/text()').extract_first()
-
-            book['title'] = title
-            book['final_image'] = final_image
+            
+            
             book['price'] = price
             book['stock'] = stock
             book['stars'] = stars
-            book['description'] = description
             book['upc'] = upc
             book['price_excl_tax'] = price_excl_tax
             book['price_inc_tax'] = price_inc_tax
             book['tax'] = tax
-
-            yield book
+            '''
+            
 
         else:
             print(response.url)

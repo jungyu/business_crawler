@@ -28,8 +28,7 @@ class BusinessScrapyPipeline:
     
     def process_item(self, item, spider):
         loguru.logger.info(item)
-        '''
-        loguru.logger.info('process_item()')
+
         created = int(time.mktime(datetime.now().timetuple()))
 
         sqlalchemy.Table(self.__listtable__, metadata, autoload=True)
@@ -51,10 +50,10 @@ class BusinessScrapyPipeline:
         article.list_id = alist.id
         article.source_url = item['article_url']
         article.title = item['title']
-        article.source_content = item['source_content']
+        article.source_content = item['description']
         article.created = created
         session.add(article)
-        '''
+   
         return item
 
     def close_spider(self, spider):
