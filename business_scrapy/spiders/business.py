@@ -9,6 +9,7 @@ import re
 import loguru
 import json
 import scrapy
+from scrapy import signals
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 import sqlalchemy
@@ -61,10 +62,10 @@ class BusinessSpider(CrawlSpider):
     base_url = source.source_domain #'http://books.toscrape.com/'
     loguru.logger.info(start_urls)
 
-    rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths=schema['extractor_link']),callback='parse_filter_book', follow=True),
+    rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths=schema['extractor_link']),callback='parse_filter_source', follow=True),
              Rule(LinkExtractor(restrict_xpaths=schema['extractor_next']))]
 
-    def parse_filter_book(self, response):
+    def parse_filter_source(self, response):
         exists = response.xpath(self.schema['xpath_exists']).extract_first()
         if exists:
 
@@ -119,6 +120,19 @@ class BusinessSpider(CrawlSpider):
 
         else:
             print(response.url)
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super(BusinessSpider, cls).from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+
+    def spider_closed(self, spider):
+        #spider.logger.info('Spider closed: %s', spider.name)
+        loguru.logger.info('Spider closed')
+        #TODO: 將資料寫到 WordPress
+        #WordpressClass.start_parse()
+        
 
 
         

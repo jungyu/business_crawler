@@ -13,6 +13,7 @@ class BusinessScrapyItem(scrapy.Item):
     title = scrapy.Field()
     final_image = scrapy.Field()
     description = scrapy.Field()
+    
 '''
 class BooksItem(scrapy.Item):
     price = scrapy.Field()
