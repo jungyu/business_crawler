@@ -17,6 +17,7 @@ import sqlalchemy.ext.automap
 
 from ..database.connection import session, metadata, automap
 from ..items import BusinessScrapyItem
+from ..conversion.wordpress import Wordpress
 
 class Param():
     def __init__(self):
@@ -129,8 +130,12 @@ class BusinessSpider(CrawlSpider):
 
     def spider_closed(self, spider):
         #spider.logger.info('Spider closed: %s', spider.name)
-        loguru.logger.info('Spider closed')
+        loguru.logger.info('Spider closed: ' + spider.name)
         #TODO: 將資料寫到 WordPress
+        wordpress = Wordpress()
+        wordpress.start_parse()
+
+
         #WordpressClass.start_parse()
         
 
