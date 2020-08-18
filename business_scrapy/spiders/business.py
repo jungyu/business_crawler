@@ -2,7 +2,7 @@
 TODO:
 資料表 crawler_source 欄位定義及範例：
   crawler_url = http://books.toscrape.com, http://... 使用逗號, 分隔
-  crawler_schema = {"allowed_domain": ["books.toscrape.com"], "allow": "catalogue/", "xpath_exists": "//div[@id=\"product_gallery\"]", "xpath_title": "//div/h1/text()", "xpath_image":"//div[@class=\"item active\"]/img/@src", "xpath_description": "//div[@id=\"product_description\"]/following-sibling::p/text()"}
+  crawler_schema = {"allowed_domain": ["books.toscrape.com"], "allow": "catalogue/",  "extractor_link":"//div[@class=\"article-list-item__intro\"]/a[1]", "extractor_next":"//*[@class=\"fa fa-chevron-right\"]/ancestor::a","xpath_exists": "//div[@id=\"product_gallery\"]", "xpath_title": "//div/h1/text()", "xpath_image":"//div[@class=\"item active\"]/img/@src", "xpath_description": "//div[@id=\"product_description\"]/following-sibling::p/text()"}
 '''
 import sys
 import re
@@ -61,11 +61,6 @@ class BusinessSpider(CrawlSpider):
     base_url = source.source_domain #'http://books.toscrape.com/'
     loguru.logger.info(start_urls)
 
-    #allow='catalogue/'
-    '''rules = [Rule(LinkExtractor(allow=schema['allow']),
-                  callback='parse_filter_book', follow=True)]'''
-
-    '''rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths="//div[@class='container article-list__container']"), callback='parse_filter_book', follow=True)]'''
     rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths=schema['extractor_link']),callback='parse_filter_book', follow=True),
              Rule(LinkExtractor(restrict_xpaths=schema['extractor_next']))]
 
