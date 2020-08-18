@@ -176,4 +176,4 @@ INSERT INTO `scrapy`.`crawler_source`
 `last_sync`,
 `enabled`)
 VALUES
-('ToScrape', NULL, 'books', 'http://books.toscrape.com', 'http://books.toscrape.com', '{\"allowed_domain\": [\"books.toscrape.com\"], \"allow\": \"catalogue/\", \"xpath_exists\": \"//div[@id=\\\"product_gallery\\\"]\", \"xpath_title\": \"//div/h1/text()\", \"xpath_image\":\"//div[@class=\\\"item active\\\"]/img/@src\", \"xpath_description\": \"//div[@id=\\\"product_description\\\"]/following-sibling::p/text()\"}', NULL, NULL, NULL, NULL, NULL);
+('ToScrape', NULL, 'books', 'http://books.toscrape.com', 'http://books.toscrape.com', '{"allowed_domain":["www.gvm.com.tw"],"allow":"article/","extractor_link":"//div[@class=\"article-list-item__intro\"]/a[1]","extractor_next":"//*[@class=\"fa fa-chevron-right\"]/ancestor::a","xpath_exists":"//h1/text()","xpath_title":"//h1/text()","xpath_image":"//figure[@class=\"pc-article-pic-full\"]/img/@src","xpath_description":"//section[@class=\"article-content\"]"}', NULL, NULL, NULL, NULL, NULL);

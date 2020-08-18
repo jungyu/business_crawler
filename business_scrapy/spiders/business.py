@@ -62,8 +62,12 @@ class BusinessSpider(CrawlSpider):
     loguru.logger.info(start_urls)
 
     #allow='catalogue/'
-    rules = [Rule(LinkExtractor(allow=schema['allow']),
-                  callback='parse_filter_book', follow=True)]
+    '''rules = [Rule(LinkExtractor(allow=schema['allow']),
+                  callback='parse_filter_book', follow=True)]'''
+
+    '''rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths="//div[@class='container article-list__container']"), callback='parse_filter_book', follow=True)]'''
+    rules = [Rule(LinkExtractor(allow=schema['allow'], restrict_xpaths=schema['extractor_link']),callback='parse_filter_book', follow=True),
+             Rule(LinkExtractor(restrict_xpaths=schema['extractor_next']))]
 
     def parse_filter_book(self, response):
         exists = response.xpath(self.schema['xpath_exists']).extract_first()
