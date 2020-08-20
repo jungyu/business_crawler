@@ -177,3 +177,15 @@ INSERT INTO `scrapy`.`crawler_source`
 `enabled`)
 VALUES
 ('ToScrape', NULL, 'books', 'http://books.toscrape.com', 'http://books.toscrape.com', '{"allowed_domain":["www.gvm.com.tw"],"allow":"article/","extractor_link":"//div[@class=\"article-list-item__intro\"]/a[1]","extractor_next":"//*[@class=\"fa fa-chevron-right\"]/ancestor::a","xpath_exists":"//h1/text()","xpath_title":"//h1/text()","xpath_image":"//figure[@class=\"pc-article-pic-full\"]/img/@src","xpath_description":"//section[@class=\"article-content\"]"}', NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO `scrapy`.`crawler_fields`
+(
+`source_id`,
+`source_fields`,
+`target_fields`)
+VALUES
+(
+1,
+'{"xpath_author":"//div[@class=\"pc-bigArticle\"]/a/text()","xpath_author_url":"//div[@class=\"pc-bigArticle\"]/a/@href","xpath_title":"//article[@class=\"pc-bigArticle\"]//h1","xpath_abstract":"//meta[@name=\"description\"]/@content","xpath_subtitles":"//section[@class=\"article-content\"]/h3/text()","xpath_content":"//section[@class=\"article-content\"]","xpath_terms":"","xpath_tags":"//ul[@class=\"BreadCrumbs\"]/li/a/text()","xpath_publish_date":"//div[@class=\"article-time\"]/text()","xpath_images":"//section[@class=\"article-content\"]//img/@src","xpath_images_alter":"//section[@class=\"article-content\"]//img/@alt","xpath_images_caption":"//section[@class=\"article-content\"]//img/following-sibling::span[@class=\"article-figcaption\"]","image_url_prefix":"","terms_ignore_indexs":"","tags_ignore_indexs":"1"}',
+'{"wp_posts":{"article":{"post_date":"xpath_publish_date","post_content":"xpath_content","post_title":"xpath_title","post_excerpt":"xpath_abstract"},"images":{"post_date":"xpath_publish_date","post_title":"xpath_images_alter","post_excerpt":"xpath_images_caption"}},"wp_postmea":{"author_name":"xpath_author","author_url":"xpath_author_url","subtitles":"xpath_subtitles"},"wp_terms":{"tags":{"name":"xpath_tags"},"terms":{"name":"xpath_terms"}}}',
+);
