@@ -1,1 +1,4 @@
 scrapy.cfg
+business_scrapy/__pycache__
+business_scrapy/database/__pycache__
+business_scrapy/spiders/__pycache__
