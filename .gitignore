@@ -1,4 +1,11 @@
 scrapy.cfg
-business_scrapy/__pycache__
-business_scrapy/database/__pycache__
-business_scrapy/spiders/__pycache__
+business_scrapy/__pycache__/__init__cpython-38.pyc
+business_scrapy/__pycache__/items.cpython-38.pyc
+business_scrapy/__pycache__/pipeline.cpython-38.pyc
+business_scrapy/__pycache__/settings.cpython-38.pyc
+business_scrapy/conversion/__pycache__/__init__cpython-38.pyc
+business_scrapy/conversion/__pycache__/wordpress.cpython-38.pyc
+business_scrapy/database/__pycache__/__init__cpython-38.pyc
+business_scrapy/database/__pycache__/connection.cpython-38.pyc
+business_scrapy/spiders/__pycache__/__init__cpython-38.pyc
+business_scrapy/spiders/__pycache__/business.cpython-38.pyc
