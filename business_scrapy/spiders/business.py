@@ -2,7 +2,7 @@
 TODO:
 資料表 crawler_source 欄位定義及範例：
   crawler_url = http://books.toscrape.com, http://... 使用逗號, 分隔
-  crawler_schema = {"allowed_domain": ["books.toscrape.com"], "allow": "catalogue/",  "extractor_link":"//div[@class=\"article-list-item__intro\"]/a[1]", "extractor_next":"//*[@class=\"fa fa-chevron-right\"]/ancestor::a","xpath_exists": "//div[@id=\"product_gallery\"]", "xpath_title": "//div/h1/text()", "xpath_image":"//div[@class=\"item active\"]/img/@src", "xpath_description": "//div[@id=\"product_description\"]/following-sibling::p/text()"}
+  crawler_schema = {"allowed_domain":["www.gvm.com.tw"],"allow":"","extractor_link":"//div[@class=\"article-list-item__intro\"]/a[1]","extractor_next":"//*[@class=\"fa fa-chevron-right\"]/ancestor::a","xpath_exists":"//h1/text()","xpath_title":"//h1/text()","xpath_image":"//figure[@class=\"pc-article-pic-full\"]/img/@src","xpath_description":"//section[@class=\"article-content\"]"}
 '''
 import sys
 import re
