@@ -132,7 +132,7 @@ class BusinessSpider(CrawlSpider):
         #spider.logger.info('Spider closed: %s', spider.name)
         loguru.logger.info('Spider closed: ' + spider.name)
         #TODO: 將資料寫到 WordPress
-        wordpress = Wordpress()
+        wordpress = Wordpress(self.source_id)
         wordpress.start_parse()
 
 
