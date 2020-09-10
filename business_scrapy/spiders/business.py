@@ -39,6 +39,7 @@ class BusinessSpider(CrawlSpider):
     name = 'business'
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
     __sourcetable__ = 'crawler_source'
+    topics = None
 
     param = Param()
     source_id = param.get_source_id()
@@ -50,6 +51,8 @@ class BusinessSpider(CrawlSpider):
     source = session.query(Source).filter(
         Source.id == int(source_id)
     ).one()
+
+    topics = source.topics
 
     try:
         schema = json.loads(source.crawler_schema)
@@ -131,12 +134,10 @@ class BusinessSpider(CrawlSpider):
     def spider_closed(self, spider):
         #spider.logger.info('Spider closed: %s', spider.name)
         loguru.logger.info('Spider closed: ' + spider.name)
+
         #TODO: 將資料寫到 WordPress
-        wordpress = Wordpress(self.source_id)
-        wordpress.start_parse()
-
-
-        #WordpressClass.start_parse()
+        wordpress = Wordpress(self.source_id, self.topics)
+        wordpress.main()
         
 
 

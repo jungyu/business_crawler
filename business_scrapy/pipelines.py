@@ -19,6 +19,8 @@ import sqlalchemy
 import sqlalchemy.ext.automap
 from .database.connection import session, metadata, automap
 
+from .conversion.wordpress import Wordpress
+
 class BusinessScrapyPipeline:
     __articletable__ = 'crawler_article'
     __articlemetatable__ = 'crawler_articlemeta'
@@ -39,7 +41,7 @@ class BusinessScrapyPipeline:
 
         alist = Alist()
         alist.source_id = item['source_id']
-        alist.topics = item['source_id']
+        alist.topic = item['topics']
         alist.article_title = item['title']
         alist.article_url = item['article_url']
         alist.created = created
@@ -65,3 +67,4 @@ class BusinessScrapyPipeline:
             session.rollback()
         finally:
             session.close()
+            loguru.logger.info('完成 pipelines.')
