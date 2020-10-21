@@ -130,7 +130,7 @@ class Wordpress():
             poststable.post_parent = '0'
             poststable.guid = ''
             poststable.menu_order = 0
-            poststable.post_type = 'post'
+            poststable.post_type = 'scrapy'
             poststable.post_mime_type = ''
             poststable.comment_count = '0'
             session.add(poststable)
