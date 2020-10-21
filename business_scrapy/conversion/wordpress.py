@@ -4,6 +4,7 @@ import loguru
 import urllib
 import json
 import time
+import ntpath
 from datetime import datetime
 
 import sqlalchemy
@@ -40,6 +41,12 @@ class Wordpress():
         articles = self.get_articles()
         posts = self.compose_articles(articles)
         self.to_wordpress(posts)
+    
+    #解析檔案路徑及檔名
+    def path_leaf(self, path):
+        path = path.split("?", 1)[0]
+        head, tail = ntpath.split(path)
+        return tail #or ntpath.basename(head)
 
     def get_fields(self):
         loguru.logger.info('get_fields')
@@ -87,7 +94,7 @@ class Wordpress():
 
     def to_wordpress(self, posts):
         loguru.logger.info('Write article to wordpress.')
-        termIds = self.find_or_insert_term(self.topics)
+        termIds = self.find_or_insert_term('category', self.topics)
         self.insert_or_update_posts(termIds, posts)
 
     def insert_or_update_posts(self, termIds, posts):
@@ -100,9 +107,9 @@ class Wordpress():
 
         for post in posts:
             slug = urllib.parse.quote(post.title, encoding="utf8")
-            slug = slug[:220] + '_id_' + str(self.source_id)
+            slug = slug[:160] + '_' + str(self.source_id) + '_' + self.path_leaf(post.article_url)
             loguru.logger.info(slug)
-            '''
+
             poststable = Poststable()
             poststable.post_author = '1'
             poststable.post_date = current_time
@@ -128,9 +135,9 @@ class Wordpress():
             poststable.comment_count = '0'
             session.add(poststable)
             session.flush()
-            '''
-            #self.process_postmeta(poststable.ID, post)
-            #self.process_categories(poststable.ID, termIds)
+
+            self.process_postmeta(poststable.ID, post)
+            self.process_categories(poststable.ID, termIds)
 
         try:
             session.commit()
@@ -147,13 +154,23 @@ class Wordpress():
         sqlalchemy.Table(self.__wp_postmeta_table__, metadata, autoload=True)
         Postmetatable = automap.classes[self.__wp_postmeta_table__]
 
-        #source_url
+        #reference
         postmetatable = Postmetatable()
         postmetatable.post_id = ID
-        postmetatable.meta_key = 'source_url'
+        postmetatable.meta_key = 'reference'
         postmetatable.meta_value = post.article_url
         session.add(postmetatable)
         session.flush()
+
+        #isbn
+        postmetatable = Postmetatable()
+        postmetatable.post_id = ID
+        postmetatable.meta_key = 'isbn'
+        postmetatable.meta_value = '' #TOFIX:post.isbn
+        session.add(postmetatable)
+        session.flush()
+
+
         
 
     def process_categories(self, ID, termIds):
@@ -162,13 +179,35 @@ class Wordpress():
         #TOFIX: count to taxonomy
 
 
-    def find_or_insert_term(self, topics):
+    def find_or_insert_term(self, taxonomy, topics):
         loguru.logger.info('find_or_insert_term')
         slug = urllib.parse.quote(topics, encoding="utf8")
         loguru.logger.info(slug)
 
         sqlalchemy.Table(self.__wp_terms_table__, metadata, autoload=True)
         Termstable = automap.classes[self.__wp_terms_table__]
+
+        sqlalchemy.Table(self.__wp_term_taxonomy_table__, metadata, autoload=True)
+        Taxonomytable = automap.classes[self.__wp_term_taxonomy_table__]
+
+        #查詢是不是已有同名的分類或標籤
+
+        term = session.query(
+            Termstable, Taxonomytable
+        ).filter(
+            Termstable.name == topics,
+            Taxonomytable.taxonomy == taxonomy,
+            Termstable.term_id == Taxonomytable.term_id
+        ).with_entities(
+            Termstable.term_id,
+            Taxonomytable.term_taxonomy_id
+        ).first()
+
+        if term:
+            loguru.logger.info('Find exist term id: ' + str(term.term_taxonomy_id))
+            return term.term_taxonomy_id
+
+
         termstable = Termstable()
         termstable.name = topics
         termstable.slug = slug
@@ -177,9 +216,7 @@ class Wordpress():
         session.flush()
 
         term_id = termstable.term_id
-
-        sqlalchemy.Table(self.__wp_term_taxonomy_table__, metadata, autoload=True)
-        Taxonomytable = automap.classes[self.__wp_term_taxonomy_table__]
+        
         taxonomytable = Taxonomytable()
         taxonomytable.term_id = term_id
         taxonomytable.taxonomy = 'category'
@@ -196,7 +233,6 @@ class Wordpress():
             session.rollback()
             return 0
         finally:
-            session.close()
             return term_id
 
     def find_or_insert_relation(self, ID, termIds):

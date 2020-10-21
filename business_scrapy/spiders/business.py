@@ -78,7 +78,10 @@ class BusinessSpider(CrawlSpider):
             title = response.xpath(self.schema['xpath_title']).extract_first()
 
             relative_image = response.xpath(self.schema['xpath_image']).extract_first()
-            final_image = self.base_url + relative_image.replace('../..', '')
+            try:
+                final_image = self.base_url + relative_image.replace('../..', '')
+            except:
+                final_image = self.base_url
 
             description = response.xpath(self.schema['xpath_description']).extract_first()
 
