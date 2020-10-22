@@ -27,9 +27,12 @@ class BusinessScrapyPipeline:
     __fieldstable__ = 'crawler_fields'
     __listtable__ = 'crawler_list'
     __mediatable__ = 'crawler_media'
-    
+
     def process_item(self, item, spider):
-        loguru.logger.info(item)
+        loguru.logger.info(item['title'])
+
+        if self.find_duplicate(item) == True:
+            return item
 
         created = int(time.mktime(datetime.now().timetuple()))
 
@@ -68,3 +71,21 @@ class BusinessScrapyPipeline:
         finally:
             session.close()
             loguru.logger.info('完成 pipelines.')
+
+    def find_duplicate(self, item):
+        sqlalchemy.Table(self.__listtable__, metadata, autoload=True)
+        Alist = automap.classes[self.__listtable__]
+
+        aList = session.query(
+            Alist
+        ).filter(
+            Alist.source_id == item['source_id'],
+            Alist.article_title == item['title'],
+            Alist.article_url == item['article_url']
+        ).first()
+
+        if aList:
+            loguru.logger.info('Find duplicate source article: ' + str(aList.id))
+            return True
+        else:
+            return False            

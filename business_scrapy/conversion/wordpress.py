@@ -26,6 +26,9 @@ class Wordpress():
     __wp_termmeta_table__ = 'wp_termmeta'
     __wp_terms_table__ = 'wp_terms'
 
+    __post_type__ = 'scrapy'
+    __taxonomy_name__ = 'scrapies'
+
     source_id = 0
     topics = None
     fields = None
@@ -47,6 +50,11 @@ class Wordpress():
         path = path.split("?", 1)[0]
         head, tail = ntpath.split(path)
         return tail #or ntpath.basename(head)
+
+    #清空字串內全部的 html tag，只留下內文
+    TAG_RE = re.compile(r'<[^>]+>')
+    def remove_tags(self, text):
+        return self.TAG_RE.sub('', text)
 
     def get_fields(self):
         loguru.logger.info('get_fields')
@@ -107,37 +115,41 @@ class Wordpress():
 
         for post in posts:
             slug = urllib.parse.quote(post.title, encoding="utf8")
-            slug = slug[:160] + '_' + str(self.source_id) + '_' + self.path_leaf(post.article_url)
+            slug = str(self.source_id) + '_' + self.path_leaf(post.article_url) + '_' + slug[:160]
             loguru.logger.info(slug)
 
-            poststable = Poststable()
-            poststable.post_author = '1'
-            poststable.post_date = current_time
-            poststable.post_date_gmt = current_time
-            poststable.post_content = post.source_content
-            poststable.post_title = post.title
-            poststable.post_excerpt = ''
-            poststable.post_status = 'publish'
-            poststable.comment_status = 'closed'
-            poststable.ping_status = 'closed'
-            poststable.post_password = ''
-            poststable.post_name = slug
-            poststable.to_ping = ''
-            poststable.pinged = ''
-            poststable.post_modified =  current_time
-            poststable.post_modified_gmt = current_time
-            poststable.post_content_filtered = ''
-            poststable.post_parent = '0'
-            poststable.guid = ''
-            poststable.menu_order = 0
-            poststable.post_type = 'scrapy'
-            poststable.post_mime_type = ''
-            poststable.comment_count = '0'
-            session.add(poststable)
-            session.flush()
+            if self.find_duplicate(slug) == False:
 
-            self.process_postmeta(poststable.ID, post)
-            self.process_categories(poststable.ID, termIds)
+                content = self.remove_tags(post.source_content)
+
+                poststable = Poststable()
+                poststable.post_author = '1'
+                poststable.post_date = current_time
+                poststable.post_date_gmt = current_time
+                poststable.post_content = content
+                poststable.post_title = post.title
+                poststable.post_excerpt = ''
+                poststable.post_status = 'publish'
+                poststable.comment_status = 'closed'
+                poststable.ping_status = 'closed'
+                poststable.post_password = ''
+                poststable.post_name = slug
+                poststable.to_ping = ''
+                poststable.pinged = ''
+                poststable.post_modified =  current_time
+                poststable.post_modified_gmt = current_time
+                poststable.post_content_filtered = ''
+                poststable.post_parent = '0'
+                poststable.guid = ''
+                poststable.menu_order = 0
+                poststable.post_type = self.__post_type__
+                poststable.post_mime_type = ''
+                poststable.comment_count = '0'
+                session.add(poststable)
+                session.flush()
+
+                self.process_postmeta(poststable.ID, post)
+                self.process_categories(poststable.ID, termIds)
 
         try:
             session.commit()
@@ -170,14 +182,26 @@ class Wordpress():
         session.add(postmetatable)
         session.flush()
 
-
-        
-
     def process_categories(self, ID, termIds):
         loguru.logger.info('process_categories')
         self.find_or_insert_relation(ID, termIds)
         #TOFIX: count to taxonomy
 
+    def find_duplicate(self, slug):
+        sqlalchemy.Table(self.__wp_posts_table__, metadata, autoload=True)
+        Poststable = automap.classes[self.__wp_posts_table__] 
+
+        post = session.query(
+            Poststable
+        ).filter(
+            Poststable.post_name == slug
+        ).first()
+
+        if post:
+            loguru.logger.info('Find duplicate id: ' + str(post.ID))
+            return True
+        else:
+            return False
 
     def find_or_insert_term(self, taxonomy, topics):
         loguru.logger.info('find_or_insert_term')
@@ -219,7 +243,7 @@ class Wordpress():
         
         taxonomytable = Taxonomytable()
         taxonomytable.term_id = term_id
-        taxonomytable.taxonomy = 'category'
+        taxonomytable.taxonomy = self.__taxonomy_name__
         taxonomytable.description = ''
         taxonomytable.parent = '0'
         session.add(taxonomytable)
@@ -247,7 +271,6 @@ class Wordpress():
         session.flush()
 
 
-        
 
 '''
 crawler_fields 資料表
