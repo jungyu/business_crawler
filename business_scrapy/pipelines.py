@@ -60,12 +60,14 @@ class BusinessScrapyPipeline:
         article.source_content = item['description']
         article.created = created
         session.add(article)
+        session.flush()
 
         articleMeta = ArticleMeta()
         articleMeta.article_id = article.id
         articleMeta.meta_key = 'publish_date'
         articleMeta.meta_value = item['publish_date']
         session.add(articleMeta)
+        session.flush()
    
         return item
 
