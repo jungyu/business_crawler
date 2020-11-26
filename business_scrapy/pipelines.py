@@ -38,9 +38,11 @@ class BusinessScrapyPipeline:
 
         sqlalchemy.Table(self.__listtable__, metadata, autoload=True)
         sqlalchemy.Table(self.__articletable__, metadata, autoload=True)
+        sqlalchemy.Table(self.__articlemetatable__, metadata, autoload=True)
 
         Article = automap.classes[self.__articletable__]
         Alist = automap.classes[self.__listtable__]
+        ArticleMeta = automap.classes[self.__articlemetatable__]
 
         alist = Alist()
         alist.source_id = item['source_id']
@@ -58,6 +60,12 @@ class BusinessScrapyPipeline:
         article.source_content = item['description']
         article.created = created
         session.add(article)
+
+        articleMeta = ArticleMeta()
+        articleMeta.article_id = article.id
+        articleMeta.meta_key = 'publish_date'
+        articleMeta.meta_value = item['publish_date']
+        session.add(articleMeta)
    
         return item
 

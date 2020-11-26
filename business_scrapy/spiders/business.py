@@ -84,6 +84,7 @@ class BusinessSpider(CrawlSpider):
                 final_image = self.base_url
 
             description = response.xpath(self.schema['xpath_description']).extract_first()
+            publish_date = response.xpath(self.schema['xpath_publish_date']).extract_first()
 
             business['source_id'] = self.source.id
             business['topics'] = self.source.topics
@@ -92,6 +93,7 @@ class BusinessSpider(CrawlSpider):
             business['title'] = title
             business['final_image'] = final_image
             business['description'] = description
+            business['publish_date'] = publish_date
 
             yield business
 
